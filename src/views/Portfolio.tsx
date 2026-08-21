@@ -84,7 +84,7 @@ export function Portfolio() {
               <span className="text-sm font-semibold text-ink-700">
                 {profile.name} target mix
               </span>
-              <span className="text-sm font-semibold text-brand-600">
+              <span className="text-sm font-semibold text-brand-400">
                 ~{formatPercent(profile.expectedReturn)} / yr historical
               </span>
             </div>
@@ -138,7 +138,7 @@ export function Portfolio() {
                       <p
                         className={cn(
                           'text-xs font-semibold tabular',
-                          row.dayChange >= 0 ? 'text-brand-600' : 'text-rose-600'
+                          row.dayChange >= 0 ? 'text-brand-400' : 'text-rose-400'
                         )}
                       >
                         {formatSignedPercent(row.dayChange)}
@@ -159,7 +159,7 @@ export function Portfolio() {
                       <span
                         className={cn(
                           'inline-flex items-center gap-1 font-semibold tabular',
-                          row.gain >= 0 ? 'text-brand-600' : 'text-rose-600'
+                          row.gain >= 0 ? 'text-brand-400' : 'text-rose-400'
                         )}
                       >
                         {row.gain >= 0 ? (
@@ -200,8 +200,8 @@ function ProfileCard({
       className={cn(
         'relative rounded-xl border p-4 text-left transition',
         selected
-          ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-100'
-          : 'border-ink-200 hover:border-ink-300 hover:bg-ink-50'
+          ? 'border-brand-500/60 bg-brand-500/15 ring-2 ring-brand-500/25'
+          : 'border-ink-200 hover:border-ink-300 hover:bg-ink-100'
       )}
     >
       {selected && (
@@ -210,7 +210,7 @@ function ProfileCard({
         </span>
       )}
       <p className="font-bold text-ink-900">{profile.name}</p>
-      <p className="mt-1 text-2xl font-extrabold text-brand-600">
+      <p className="mt-1 text-2xl font-extrabold text-brand-400">
         {formatPercent(profile.expectedReturn)}
       </p>
       <p className="text-[11px] font-medium text-ink-400">avg. annual return</p>

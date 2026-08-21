@@ -28,7 +28,7 @@ function ProjectionTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   const p = payload[0].payload;
   return (
-    <div className="rounded-xl border border-ink-100 bg-white/95 px-3.5 py-2.5 shadow-card">
+    <div className="rounded-xl border border-ink-100 bg-surface/95 px-3.5 py-2.5 shadow-card backdrop-blur">
       <div className="mb-1 text-xs font-medium text-ink-400">Year {label}</div>
       <div className="space-y-0.5 text-sm">
         <Row color="#10b981" label="Projected" value={p.expected} bold />
@@ -102,7 +102,7 @@ export function Grow() {
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-4 p-5 pb-0">
           <div>
-            <div className="flex items-center gap-2 text-brand-600">
+            <div className="flex items-center gap-2 text-brand-400">
               <Sprout size={18} />
               <span className="text-sm font-semibold">Growth projection</span>
             </div>
@@ -131,7 +131,7 @@ export function Grow() {
                   <stop offset="100%" stopColor="#10b981" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#eceef2" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#1b2230" vertical={false} />
               <XAxis
                 dataKey="year"
                 tickFormatter={(v) => (v === 0 ? 'Now' : `${v}y`)}
@@ -285,8 +285,8 @@ function ResultCard({
   tone: 'brand' | 'neutral' | 'positive';
 }) {
   const tones: Record<string, string> = {
-    brand: 'text-brand-600',
-    positive: 'text-brand-600',
+    brand: 'text-brand-400',
+    positive: 'text-brand-400',
     neutral: 'text-ink-900',
   };
   return (

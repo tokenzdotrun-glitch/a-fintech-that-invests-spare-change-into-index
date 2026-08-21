@@ -49,15 +49,24 @@ function Shell() {
   const { state, walletBalance } = useStore();
   const [view, setView] = useState<View>('dashboard');
   const [modalOpen, setModalOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const firstName = state.name.split(' ')[0];
 
   return (
     <div className="min-h-screen">
-      {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-ink-100 bg-white px-4 py-5 lg:flex">
-        <div className="px-2">
-          <Logo />
+      {/* Desktop sidebar — collapsed to icons, expands while hovered */}
+      <aside
+        onMouseEnter={() => setExpanded(true)}
+        onMouseLeave={() => setExpanded(false)}
+        className={cn(
+          'fixed inset-y-0 left-0 z-30 hidden flex-col overflow-hidden border-r border-ink-100 bg-surface px-3 py-5 transition-[width] duration-300 ease-out lg:flex',
+          expanded ? 'w-64 shadow-rail' : 'w-20'
+        )}
+      >
+        <div className={cn('px-1 transition-all', expanded ? '' : 'flex justify-center')}>
+          <Logo showWordmark={expanded} />
         </div>
+
         <nav className="mt-8 flex-1 space-y-1">
           {NAV.map((item) => {
             const Icon = item.icon;
@@ -66,40 +75,59 @@ function Shell() {
               <button
                 key={item.id}
                 onClick={() => setView(item.id)}
+                title={!expanded ? item.label : undefined}
                 className={cn(
-                  'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition',
+                  'flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors',
+                  expanded ? 'justify-start' : 'justify-center',
                   active
-                    ? 'bg-brand-50 text-brand-700'
-                    : 'text-ink-500 hover:bg-ink-50 hover:text-ink-800'
+                    ? 'bg-brand-500/15 text-brand-300'
+                    : 'text-ink-500 hover:bg-ink-100 hover:text-ink-800'
                 )}
               >
-                <Icon size={18} />
-                {item.label}
+                <Icon size={19} className="shrink-0" />
+                <span
+                  className={cn(
+                    'overflow-hidden whitespace-nowrap transition-all duration-200',
+                    expanded ? 'ml-3 w-auto opacity-100' : 'w-0 opacity-0'
+                  )}
+                >
+                  {item.label}
+                </span>
               </button>
             );
           })}
         </nav>
 
-        <div className="rounded-2xl bg-gradient-to-br from-ink-900 to-ink-800 p-4 text-white">
-          <div className="flex items-center gap-2 text-brand-300">
-            <Wallet size={15} />
-            <span className="text-xs font-semibold">Ready to invest</span>
+        {expanded ? (
+          <div className="rounded-2xl border border-ink-100 bg-surface-raised p-4">
+            <div className="flex items-center gap-2 text-brand-300">
+              <Wallet size={15} />
+              <span className="text-xs font-semibold">Ready to invest</span>
+            </div>
+            <p className="mt-1 text-2xl font-extrabold tabular text-ink-900">
+              {formatCurrency(walletBalance)}
+            </p>
+            <Button
+              size="sm"
+              onClick={() => setModalOpen(true)}
+              className="mt-3 w-full"
+            >
+              <Plus size={15} /> Simulate purchase
+            </Button>
           </div>
-          <p className="mt-1 text-2xl font-extrabold tabular">
-            {formatCurrency(walletBalance)}
-          </p>
-          <Button
-            size="sm"
+        ) : (
+          <button
             onClick={() => setModalOpen(true)}
-            className="mt-3 w-full"
+            title="Simulate purchase"
+            className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500 text-ink-950 shadow-soft transition-colors hover:bg-brand-400"
           >
-            <Plus size={15} /> Simulate purchase
-          </Button>
-        </div>
+            <Plus size={20} />
+          </button>
+        )}
       </aside>
 
       {/* Main column */}
-      <div className="lg:pl-64">
+      <div className="lg:pl-20">
         {/* Top bar */}
         <header className="sticky top-0 z-20 border-b border-ink-100 bg-ink-50/80 backdrop-blur-md">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
@@ -115,8 +143,8 @@ function Shell() {
               </h1>
             </div>
             <div className="flex items-center gap-3">
-              <div className="hidden items-center gap-2 rounded-full border border-ink-200 bg-white px-3 py-1.5 sm:flex">
-                <Wallet size={14} className="text-brand-600" />
+              <div className="hidden items-center gap-2 rounded-full border border-ink-200 bg-surface px-3 py-1.5 sm:flex">
+                <Wallet size={14} className="text-brand-400" />
                 <span className="text-sm font-bold tabular text-ink-800">
                   {formatCurrency(walletBalance)}
                 </span>
@@ -158,7 +186,7 @@ function Shell() {
       </div>
 
       {/* Mobile bottom nav */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-ink-100 bg-white/95 backdrop-blur-md lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-ink-100 bg-surface/95 backdrop-blur-md lg:hidden">
         <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-1.5">
           {NAV.map((item) => {
             const Icon = item.icon;
@@ -169,7 +197,7 @@ function Shell() {
                 onClick={() => setView(item.id)}
                 className={cn(
                   'flex flex-1 flex-col items-center gap-0.5 rounded-lg px-1 py-2 text-[10px] font-semibold transition',
-                  active ? 'text-brand-600' : 'text-ink-400'
+                  active ? 'text-brand-400' : 'text-ink-400'
                 )}
               >
                 <Icon size={20} />

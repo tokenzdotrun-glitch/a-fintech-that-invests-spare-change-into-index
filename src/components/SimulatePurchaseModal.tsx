@@ -53,14 +53,14 @@ export function SimulatePurchaseModal({
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-ink-950/40 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-ink-950/70 p-0 backdrop-blur-sm sm:items-center sm:p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
           <motion.div
-            className="w-full max-w-md rounded-t-3xl bg-white p-6 shadow-2xl sm:rounded-3xl"
+            className="w-full max-w-md rounded-t-3xl border border-ink-100 bg-surface p-6 shadow-2xl sm:rounded-3xl"
             initial={{ y: 40, opacity: 0, scale: 0.98 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 40, opacity: 0, scale: 0.98 }}
@@ -92,7 +92,7 @@ export function SimulatePurchaseModal({
                   value={merchant}
                   onChange={(e) => setMerchant(e.target.value)}
                   placeholder="e.g. Blue Bottle Coffee"
-                  className="w-full rounded-xl border border-ink-200 px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+                  className="w-full rounded-xl border border-ink-200 bg-surface-sunken px-3.5 py-2.5 text-sm text-ink-800 outline-none transition placeholder:text-ink-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25"
                 />
               </div>
 
@@ -112,8 +112,8 @@ export function SimulatePurchaseModal({
                         className={cn(
                           'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition',
                           active
-                            ? 'border-brand-500 bg-brand-50 text-brand-700'
-                            : 'border-ink-200 text-ink-600 hover:bg-ink-50'
+                            ? 'border-brand-500/60 bg-brand-500/15 text-brand-300'
+                            : 'border-ink-200 text-ink-500 hover:bg-ink-100 hover:text-ink-700'
                         )}
                       >
                         <Icon size={13} />
@@ -137,16 +137,16 @@ export function SimulatePurchaseModal({
                     onChange={(e) => setAmount(e.target.value)}
                     inputMode="decimal"
                     placeholder="0.00"
-                    className="w-full rounded-xl border border-ink-200 py-2.5 pl-7 pr-3.5 text-sm tabular outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+                    className="w-full rounded-xl border border-ink-200 bg-surface-sunken py-2.5 pl-7 pr-3.5 text-sm tabular text-ink-800 outline-none transition placeholder:text-ink-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-between rounded-xl bg-brand-50 px-4 py-3">
-                <span className="text-sm font-medium text-brand-800">
+              <div className="flex items-center justify-between rounded-xl bg-brand-500/15 px-4 py-3">
+                <span className="text-sm font-medium text-brand-200">
                   Spare change to invest
                 </span>
-                <span className="text-lg font-bold tabular text-brand-700">
+                <span className="text-lg font-bold tabular text-brand-300">
                   {formatCurrency(roundUp)}
                 </span>
               </div>

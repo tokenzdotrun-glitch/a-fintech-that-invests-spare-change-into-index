@@ -28,8 +28,8 @@ export function Settings() {
               className={cn(
                 'flex-1 rounded-xl border px-4 py-3 text-center font-bold transition',
                 s.roundUpMultiplier === m
-                  ? 'border-brand-500 bg-brand-50 text-brand-700'
-                  : 'border-ink-200 text-ink-600 hover:bg-ink-50'
+                  ? 'border-brand-500/60 bg-brand-500/15 text-brand-300'
+                  : 'border-ink-200 text-ink-500 hover:bg-ink-100 hover:text-ink-700'
               )}
             >
               {m}×
@@ -45,7 +45,7 @@ export function Settings() {
           desc="Sweep your round-up wallet into index funds automatically."
         />
         <div className="space-y-5 p-5 pt-0">
-          <div className="flex items-center justify-between rounded-xl bg-ink-50 px-4 py-3">
+          <div className="flex items-center justify-between rounded-xl bg-surface-sunken px-4 py-3">
             <div>
               <p className="font-semibold text-ink-800">Auto-invest</p>
               <p className="text-xs text-ink-500">
@@ -69,8 +69,8 @@ export function Settings() {
                   className={cn(
                     'flex-1 rounded-xl border px-3 py-2.5 text-center text-sm font-semibold transition disabled:opacity-40',
                     s.sweepThreshold === t
-                      ? 'border-brand-500 bg-brand-50 text-brand-700'
-                      : 'border-ink-200 text-ink-600 hover:bg-ink-50'
+                      ? 'border-brand-500/60 bg-brand-500/15 text-brand-300'
+                      : 'border-ink-200 text-ink-500 hover:bg-ink-100 hover:text-ink-700'
                   )}
                 >
                   {formatCurrency(t, { cents: false })}
@@ -95,8 +95,8 @@ export function Settings() {
               className={cn(
                 'flex-1 rounded-xl border px-3 py-2.5 text-center text-sm font-semibold transition',
                 s.weeklyRecurring === r
-                  ? 'border-brand-500 bg-brand-50 text-brand-700'
-                  : 'border-ink-200 text-ink-600 hover:bg-ink-50'
+                  ? 'border-brand-500/60 bg-brand-500/15 text-brand-300'
+                  : 'border-ink-200 text-ink-500 hover:bg-ink-100 hover:text-ink-700'
               )}
             >
               {r === 0 ? 'Off' : `${formatCurrency(r, { cents: false })}/wk`}
@@ -122,12 +122,12 @@ export function Settings() {
                 className={cn(
                   'rounded-xl border p-4 text-left transition',
                   active
-                    ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-100'
-                    : 'border-ink-200 hover:bg-ink-50'
+                    ? 'border-brand-500/60 bg-brand-500/15 ring-2 ring-brand-500/25'
+                    : 'border-ink-200 hover:bg-ink-100'
                 )}
               >
                 <p className="font-bold text-ink-900">{p.name}</p>
-                <p className="text-sm font-semibold text-brand-600">
+                <p className="text-sm font-semibold text-brand-400">
                   {formatPercent(p.expectedReturn)}/yr
                 </p>
               </button>
@@ -136,7 +136,7 @@ export function Settings() {
         </div>
       </Card>
 
-      <Card className="border-rose-200">
+      <Card className="border-rose-500/30">
         <SettingHeader
           icon={<RotateCcw size={18} />}
           title="Reset demo"
@@ -179,7 +179,7 @@ function SettingHeader({
 }) {
   return (
     <div className="flex items-start gap-3 p-5">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/15 text-brand-300">
         {icon}
       </div>
       <div>
@@ -196,7 +196,7 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
       onClick={() => onChange(!on)}
       className={cn(
         'relative h-6 w-11 shrink-0 rounded-full transition-colors',
-        on ? 'bg-brand-600' : 'bg-ink-300'
+        on ? 'bg-brand-500' : 'bg-ink-300'
       )}
       role="switch"
       aria-checked={on}

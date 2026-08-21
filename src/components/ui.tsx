@@ -14,7 +14,7 @@ export function Card({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-ink-100 bg-white shadow-card',
+        'rounded-2xl border border-ink-100 bg-surface shadow-card',
         className
       )}
     >
@@ -33,9 +33,9 @@ export function Badge({
   className?: string;
 }) {
   const tones: Record<string, string> = {
-    neutral: 'bg-ink-100 text-ink-600',
-    positive: 'bg-brand-100 text-brand-700',
-    negative: 'bg-rose-100 text-rose-700',
+    neutral: 'bg-ink-100 text-ink-500',
+    positive: 'bg-brand-500/15 text-brand-300',
+    negative: 'bg-rose-500/15 text-rose-300',
     brand: 'bg-brand-600 text-white',
   };
   return (
@@ -67,11 +67,11 @@ export function Button({
 }: ButtonProps) {
   const variants: Record<string, string> = {
     primary:
-      'bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 shadow-soft',
+      'bg-brand-500 text-ink-950 hover:bg-brand-400 active:bg-brand-500 shadow-soft',
     secondary:
-      'bg-white text-ink-800 border border-ink-200 hover:bg-ink-50 active:bg-ink-100',
-    ghost: 'text-ink-600 hover:bg-ink-100',
-    danger: 'bg-rose-600 text-white hover:bg-rose-700',
+      'bg-surface-raised text-ink-800 border border-ink-200 hover:bg-ink-200 active:bg-ink-200',
+    ghost: 'text-ink-500 hover:bg-ink-100 hover:text-ink-800',
+    danger: 'bg-rose-600 text-white hover:bg-rose-500',
   };
   const sizes: Record<string, string> = {
     sm: 'px-3 py-1.5 text-sm',

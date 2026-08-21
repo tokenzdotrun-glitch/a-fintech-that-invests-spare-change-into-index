@@ -16,7 +16,7 @@ function ChartTooltip({ active, payload }: any) {
   if (!active || !payload || !payload.length) return null;
   const point = payload[0].payload as SeriesPoint;
   return (
-    <div className="rounded-xl border border-ink-100 bg-white/95 px-3.5 py-2.5 shadow-card backdrop-blur">
+    <div className="rounded-xl border border-ink-100 bg-surface/95 px-3.5 py-2.5 shadow-card backdrop-blur">
       <div className="mb-1 text-xs font-medium text-ink-400">
         {format(new Date(point.date), 'MMM d, yyyy')}
       </div>
@@ -61,7 +61,7 @@ export function PerformanceChart({
             <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#eceef2" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#1b2230" vertical={false} />
         <XAxis
           dataKey="date"
           tickFormatter={(v) => format(new Date(v), 'MMM d')}

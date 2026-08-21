@@ -29,7 +29,7 @@ export function TransactionRow({ tx }: { tx: Transaction }) {
         <div className="flex items-center gap-2">
           <p className="truncate font-semibold text-ink-900">{tx.merchant}</p>
           {tx.status === 'pending' ? (
-            <span className="shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-700">
+            <span className="shrink-0 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-300">
               Pending
             </span>
           ) : null}
@@ -43,11 +43,11 @@ export function TransactionRow({ tx }: { tx: Transaction }) {
           {formatCurrency(-tx.amount)}
         </p>
         {tx.roundUp > 0 ? (
-          <p className="text-xs font-semibold tabular text-brand-600">
+          <p className="text-xs font-semibold tabular text-brand-400">
             +{formatCurrency(tx.roundUp)} saved
           </p>
         ) : (
-          <p className="text-xs text-ink-300">no round-up</p>
+          <p className="text-xs text-ink-400">no round-up</p>
         )}
       </div>
     </div>

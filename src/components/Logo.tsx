@@ -1,4 +1,12 @@
-export function Logo({ size = 32 }: { size?: number }) {
+import { cn } from './ui';
+
+export function Logo({
+  size = 32,
+  showWordmark = true,
+}: {
+  size?: number;
+  showWordmark?: boolean;
+}) {
   return (
     <div className="flex items-center gap-2.5">
       <svg
@@ -8,6 +16,7 @@ export function Logo({ size = 32 }: { size?: number }) {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden
+        className="shrink-0"
       >
         <rect width="32" height="32" rx="9" fill="#10b981" />
         <path
@@ -15,7 +24,12 @@ export function Logo({ size = 32 }: { size?: number }) {
           fill="white"
         />
       </svg>
-      <span className="text-[19px] font-extrabold tracking-tight text-ink-900">
+      <span
+        className={cn(
+          'overflow-hidden whitespace-nowrap text-[19px] font-bold tracking-tight text-ink-900 transition-all duration-200',
+          showWordmark ? 'w-auto opacity-100' : 'w-0 opacity-0'
+        )}
+      >
         Acol
       </span>
     </div>

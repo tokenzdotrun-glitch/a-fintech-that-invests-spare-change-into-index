@@ -54,7 +54,7 @@ export function Transactions({ onSimulate }: { onSimulate: () => void }) {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search merchants…"
-                  className="w-full rounded-xl border border-ink-200 py-2.5 pl-9 pr-3 text-sm outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+                  className="w-full rounded-xl border border-ink-200 bg-surface-sunken py-2.5 pl-9 pr-3 text-sm text-ink-800 outline-none transition placeholder:text-ink-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25"
                 />
               </div>
               <Button onClick={onSimulate} className="shrink-0">
@@ -104,7 +104,7 @@ export function Transactions({ onSimulate }: { onSimulate: () => void }) {
                   <h3 className="text-xs font-bold uppercase tracking-wide text-ink-400">
                     {day}
                   </h3>
-                  <span className="text-xs font-semibold text-brand-600">
+                  <span className="text-xs font-semibold text-brand-400">
                     +{formatCurrency(txs.reduce((s, t) => s + t.roundUp, 0))}
                   </span>
                 </div>
@@ -159,8 +159,8 @@ function FilterChip({
       className={cn(
         'rounded-full border px-3 py-1.5 text-xs font-semibold transition',
         active
-          ? 'border-brand-500 bg-brand-50 text-brand-700'
-          : 'border-ink-200 text-ink-600 hover:bg-ink-50'
+          ? 'border-brand-500/60 bg-brand-500/15 text-brand-300'
+          : 'border-ink-200 text-ink-500 hover:bg-ink-100 hover:text-ink-700'
       )}
     >
       {children}
@@ -183,7 +183,7 @@ function SummaryRow({
       <span
         className={cn(
           'font-bold tabular',
-          accent ? 'text-lg text-brand-600' : 'text-ink-800'
+          accent ? 'text-lg text-brand-400' : 'text-ink-800'
         )}
       >
         {value}

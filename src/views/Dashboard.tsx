@@ -89,8 +89,8 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
                   className={cn(
                     'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-sm font-bold',
                     gain >= 0
-                      ? 'bg-brand-100 text-brand-700'
-                      : 'bg-rose-100 text-rose-700'
+                      ? 'bg-brand-500/15 text-brand-300'
+                      : 'bg-rose-500/15 text-rose-300'
                   )}
                 >
                   {gain >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
@@ -101,7 +101,7 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
                 <span
                   className={cn(
                     'font-semibold',
-                    gain >= 0 ? 'text-brand-600' : 'text-rose-600'
+                    gain >= 0 ? 'text-brand-400' : 'text-rose-400'
                   )}
                 >
                   {formatCurrency(gain, { sign: true })}
@@ -110,7 +110,7 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
               </p>
             </div>
 
-            <div className="flex rounded-xl bg-ink-100 p-1">
+            <div className="flex rounded-xl bg-surface-sunken p-1">
               {TIMEFRAMES.map((t) => (
                 <button
                   key={t.key}
@@ -118,7 +118,7 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
                   className={cn(
                     'rounded-lg px-3 py-1.5 text-xs font-bold transition',
                     tf === t.key
-                      ? 'bg-white text-ink-900 shadow-soft'
+                      ? 'bg-surface-raised text-ink-900 shadow-soft'
                       : 'text-ink-500 hover:text-ink-700'
                   )}
                 >
@@ -139,7 +139,7 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
             <span
               className={cn(
                 'font-semibold tabular',
-                periodPositive ? 'text-brand-600' : 'text-rose-600'
+                periodPositive ? 'text-brand-400' : 'text-rose-400'
               )}
             >
               {formatCurrency(period.marketGain, { sign: true })} (
@@ -186,7 +186,7 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
             <h3 className="font-bold text-ink-900">Recent activity</h3>
             <button
               onClick={() => onNavigate('transactions')}
-              className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-brand-400 hover:text-brand-300"
             >
               View all <ArrowRight size={14} />
             </button>
@@ -203,7 +203,7 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
             <h3 className="font-bold text-ink-900">Allocation</h3>
             <button
               onClick={() => onNavigate('portfolio')}
-              className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-brand-400 hover:text-brand-300"
             >
               Details <ArrowRight size={14} />
             </button>
@@ -229,10 +229,10 @@ function StatCard({
   tone: 'brand' | 'positive' | 'negative' | 'neutral';
 }) {
   const tones: Record<string, string> = {
-    brand: 'bg-brand-100 text-brand-700',
-    positive: 'bg-brand-100 text-brand-700',
-    negative: 'bg-rose-100 text-rose-700',
-    neutral: 'bg-ink-100 text-ink-600',
+    brand: 'bg-brand-500/15 text-brand-300',
+    positive: 'bg-brand-500/15 text-brand-300',
+    negative: 'bg-rose-500/15 text-rose-300',
+    neutral: 'bg-ink-100 text-ink-500',
   };
   return (
     <Card className="p-4">
