@@ -1,0 +1,194 @@
+import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  LayoutDashboard,
+  Receipt,
+  PieChart,
+  Sprout,
+  Settings as SettingsIcon,
+  Plus,
+  Wallet,
+} from 'lucide-react';
+import { StoreProvider, useStore } from './lib/store';
+import { Logo } from './components/Logo';
+import { Button, cn } from './components/ui';
+import { SimulatePurchaseModal } from './components/SimulatePurchaseModal';
+import { Dashboard } from './views/Dashboard';
+import { Transactions } from './views/Transactions';
+import { Portfolio } from './views/Portfolio';
+import { Grow } from './views/Grow';
+import { Settings } from './views/Settings';
+import { formatCurrency } from './lib/format';
+
+export type View = 'dashboard' | 'transactions' | 'portfolio' | 'grow' | 'settings';
+
+const NAV: { id: View; label: string; icon: typeof LayoutDashboard }[] = [
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'transactions', label: 'Transactions', icon: Receipt },
+  { id: 'portfolio', label: 'Portfolio', icon: PieChart },
+  { id: 'grow', label: 'Grow', icon: Sprout },
+  { id: 'settings', label: 'Settings', icon: SettingsIcon },
+];
+
+const TITLES: Record<View, { title: string; subtitle: string }> = {
+  dashboard: { title: 'Dashboard', subtitle: "Here's how your spare change is doing." },
+  transactions: { title: 'Transactions', subtitle: 'Every purchase, rounded up.' },
+  portfolio: { title: 'Portfolio', subtitle: 'Your diversified index-fund mix.' },
+  grow: { title: 'Grow', subtitle: 'See where your round-ups could take you.' },
+  settings: { title: 'Settings', subtitle: 'Tune how you round up and invest.' },
+};
+
+function greeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
+function Shell() {
+  const { state, walletBalance } = useStore();
+  const [view, setView] = useState<View>('dashboard');
+  const [modalOpen, setModalOpen] = useState(false);
+  const firstName = state.name.split(' ')[0];
+
+  return (
+    <div className="min-h-screen">
+      {/* Desktop sidebar */}
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-ink-100 bg-white px-4 py-5 lg:flex">
+        <div className="px-2">
+          <Logo />
+        </div>
+        <nav className="mt-8 flex-1 space-y-1">
+          {NAV.map((item) => {
+            const Icon = item.icon;
+            const active = view === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setView(item.id)}
+                className={cn(
+                  'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition',
+                  active
+                    ? 'bg-brand-50 text-brand-700'
+                    : 'text-ink-500 hover:bg-ink-50 hover:text-ink-800'
+                )}
+              >
+                <Icon size={18} />
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="rounded-2xl bg-gradient-to-br from-ink-900 to-ink-800 p-4 text-white">
+          <div className="flex items-center gap-2 text-brand-300">
+            <Wallet size={15} />
+            <span className="text-xs font-semibold">Ready to invest</span>
+          </div>
+          <p className="mt-1 text-2xl font-extrabold tabular">
+            {formatCurrency(walletBalance)}
+          </p>
+          <Button
+            size="sm"
+            onClick={() => setModalOpen(true)}
+            className="mt-3 w-full"
+          >
+            <Plus size={15} /> Simulate purchase
+          </Button>
+        </div>
+      </aside>
+
+      {/* Main column */}
+      <div className="lg:pl-64">
+        {/* Top bar */}
+        <header className="sticky top-0 z-20 border-b border-ink-100 bg-ink-50/80 backdrop-blur-md">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+            <div className="lg:hidden">
+              <Logo size={28} />
+            </div>
+            <div className="hidden lg:block">
+              <p className="text-xs font-medium text-ink-400">
+                {greeting()}, {firstName}
+              </p>
+              <h1 className="text-xl font-extrabold tracking-tight text-ink-900">
+                {TITLES[view].title}
+              </h1>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="hidden items-center gap-2 rounded-full border border-ink-200 bg-white px-3 py-1.5 sm:flex">
+                <Wallet size={14} className="text-brand-600" />
+                <span className="text-sm font-bold tabular text-ink-800">
+                  {formatCurrency(walletBalance)}
+                </span>
+              </div>
+              <Button onClick={() => setModalOpen(true)} className="hidden sm:inline-flex">
+                <Plus size={16} /> Simulate purchase
+              </Button>
+              <Button
+                onClick={() => setModalOpen(true)}
+                className="sm:hidden"
+                size="sm"
+              >
+                <Plus size={16} />
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        {/* Content */}
+        <main className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:pb-10">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={view}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+            >
+              {view === 'dashboard' && <Dashboard onNavigate={setView} />}
+              {view === 'transactions' && (
+                <Transactions onSimulate={() => setModalOpen(true)} />
+              )}
+              {view === 'portfolio' && <Portfolio />}
+              {view === 'grow' && <Grow />}
+              {view === 'settings' && <Settings />}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      </div>
+
+      {/* Mobile bottom nav */}
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-ink-100 bg-white/95 backdrop-blur-md lg:hidden">
+        <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-1.5">
+          {NAV.map((item) => {
+            const Icon = item.icon;
+            const active = view === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setView(item.id)}
+                className={cn(
+                  'flex flex-1 flex-col items-center gap-0.5 rounded-lg px-1 py-2 text-[10px] font-semibold transition',
+                  active ? 'text-brand-600' : 'text-ink-400'
+                )}
+              >
+                <Icon size={20} />
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+
+      <SimulatePurchaseModal open={modalOpen} onClose={() => setModalOpen(false)} />
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <StoreProvider>
+      <Shell />
+    </StoreProvider>
+  );
+}
