@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Dice5, Sparkles } from 'lucide-react';
+import { X, Sparkles } from 'lucide-react';
 import { CATEGORIES, categoryStyle } from '../lib/categories';
-import { computeRoundUp, MERCHANTS } from '../lib/engine';
+import { computeRoundUp } from '../lib/engine';
 import { useStore } from '../lib/store';
 import { formatCurrency } from '../lib/format';
 import { Button, cn } from './ui';
@@ -28,14 +28,6 @@ export function SimulatePurchaseModal({
         state.settings.roundUpMultiplier
       )
     : 0;
-
-  function randomize() {
-    const m = MERCHANTS[Math.floor(Math.random() * MERCHANTS.length)];
-    const raw = m.min + Math.random() * (m.max - m.min);
-    setMerchant(m.name);
-    setCategory(m.category);
-    setAmount((Math.round(raw * 100) / 100).toFixed(2));
-  }
 
   function submit() {
     if (!valid) return;
@@ -152,10 +144,7 @@ export function SimulatePurchaseModal({
               </div>
 
               <div className="flex gap-3 pt-1">
-                <Button variant="secondary" onClick={randomize} className="flex-1">
-                  <Dice5 size={16} /> Random
-                </Button>
-                <Button onClick={submit} disabled={!valid} className="flex-[1.4]">
+                <Button onClick={submit} disabled={!valid} className="w-full">
                   <Sparkles size={16} /> Add purchase
                 </Button>
               </div>

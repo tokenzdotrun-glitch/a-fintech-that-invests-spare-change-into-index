@@ -7,20 +7,17 @@ import {
   type ReactNode,
 } from 'react';
 import {
-  buySharesForAmount,
   computeRoundUp,
   DEFAULT_SETTINGS,
   generateInitialState,
-  makeTransaction,
-  mulberry32,
+  splitByAllocation,
   uid,
 } from './engine';
 import type { AppState, Settings, Transaction } from './types';
 
-const STORAGE_KEY = 'acol.state.v1';
+const STORAGE_KEY = 'acol.state.v2';
 
 type Action =
-  | { type: 'ADD_RANDOM_TX' }
   | { type: 'ADD_TX'; tx: Transaction }
   | { type: 'INVEST_NOW' }
   | { type: 'UPDATE_SETTINGS'; patch: Partial<Settings> }
@@ -40,7 +37,7 @@ function sweepWallet(state: AppState, source: 'roundup' = 'roundup'): AppState {
     date: now,
     amount,
     source,
-    byFund: buySharesForAmount(amount, state.settings.riskProfile, now),
+    byFund: splitByAllocation(amount, state.settings.riskProfile),
   };
   return {
     ...state,
@@ -70,12 +67,6 @@ function reducer(state: AppState, action: Action): AppState {
 
     case 'RESET':
       return generateInitialState(state.name);
-
-    case 'ADD_RANDOM_TX': {
-      const rng = mulberry32((Math.random() * 1e9) | 0);
-      const tx = makeTransaction(rng, new Date(), state.settings);
-      return applyNewTx(state, tx);
-    }
 
     case 'ADD_TX':
       return applyNewTx(state, action.tx);
@@ -142,7 +133,6 @@ function withDefaults(parsed: AppState): AppState {
 
 interface StoreValue {
   state: AppState;
-  addRandomTransaction: () => void;
   addTransaction: (input: {
     merchant: string;
     amount: number;
@@ -174,7 +164,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     );
     return {
       state,
-      addRandomTransaction: () => dispatch({ type: 'ADD_RANDOM_TX' }),
       addTransaction: (input) => {
         const roundUp = computeRoundUp(
           input.amount,

@@ -1,17 +1,13 @@
 import { useMemo, useState } from 'react';
-import { TrendingUp, TrendingDown, Coins, Wallet, PiggyBank, ArrowRight } from 'lucide-react';
+import { Coins, Wallet, PiggyBank, Receipt, ArrowRight } from 'lucide-react';
 import {
   buildValueSeries,
   holdingsBreakdown,
-  periodReturn,
   portfolioValueAt,
   totalInvested,
 } from '../lib/engine';
 import { useStore } from '../lib/store';
-import {
-  formatCurrency,
-  formatSignedPercent,
-} from '../lib/format';
+import { formatCurrency } from '../lib/format';
 import { Card, cn } from '../components/ui';
 import { PerformanceChart } from '../components/PerformanceChart';
 import { RoundUpWallet } from '../components/RoundUpWallet';
@@ -39,8 +35,6 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
     () => totalInvested(state.investments),
     [state.investments]
   );
-  const gain = value - invested;
-  const gainPct = invested > 0 ? gain / invested : 0;
 
   const allDays = useMemo(() => {
     const created = new Date(state.createdAt).getTime();
@@ -50,11 +44,6 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
   const days = tf === 'ALL' ? allDays : TIMEFRAMES.find((t) => t.key === tf)!.days;
   const series = useMemo(
     () => buildValueSeries(state.investments, days, now),
-    [state.investments, days, now]
-  );
-
-  const period = useMemo(
-    () => periodReturn(state.investments, days, now),
     [state.investments, days, now]
   );
 
@@ -71,7 +60,6 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
   );
 
   const recent = state.transactions.slice(0, 6);
-  const periodPositive = period.marketGain >= 0;
 
   return (
     <div className="space-y-6">
@@ -85,28 +73,9 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
                 <span className="text-4xl font-extrabold tracking-tight text-ink-900 tabular">
                   {formatCurrency(value)}
                 </span>
-                <span
-                  className={cn(
-                    'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-sm font-bold',
-                    gain >= 0
-                      ? 'bg-brand-500/15 text-brand-300'
-                      : 'bg-rose-500/15 text-rose-300'
-                  )}
-                >
-                  {gain >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                  {formatSignedPercent(gainPct)}
-                </span>
               </div>
               <p className="mt-1 text-sm text-ink-500">
-                <span
-                  className={cn(
-                    'font-semibold',
-                    gain >= 0 ? 'text-brand-400' : 'text-rose-400'
-                  )}
-                >
-                  {formatCurrency(gain, { sign: true })}
-                </span>{' '}
-                all-time · {formatCurrency(invested)} invested
+                {formatCurrency(invested)} invested so far
               </p>
             </div>
 
@@ -129,22 +98,7 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
           </div>
 
           <div className="px-2 pb-2 pt-3">
-            <PerformanceChart data={series} height={260} />
-          </div>
-
-          <div className="flex items-center justify-between border-t border-ink-100 px-5 py-3 text-sm">
-            <span className="text-ink-500">
-              {tf === 'ALL' ? 'Market return since you joined' : `Market return · past ${tf}`}
-            </span>
-            <span
-              className={cn(
-                'font-semibold tabular',
-                periodPositive ? 'text-brand-400' : 'text-rose-400'
-              )}
-            >
-              {formatCurrency(period.marketGain, { sign: true })} (
-              {formatSignedPercent(period.pct)})
-            </span>
+            <PerformanceChart data={series} height={260} showInvested={false} />
           </div>
         </Card>
 
@@ -160,12 +114,6 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
           tone="brand"
         />
         <StatCard
-          icon={gain >= 0 ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
-          label="All-time gain"
-          value={formatCurrency(gain, { sign: true })}
-          tone={gain >= 0 ? 'positive' : 'negative'}
-        />
-        <StatCard
           icon={<PiggyBank size={18} />}
           label="Round-ups (30d)"
           value={formatCurrency(roundUpsThisMonth)}
@@ -175,6 +123,12 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
           icon={<Wallet size={18} />}
           label="Ready to invest"
           value={formatCurrency(state.walletCents / 100)}
+          tone="neutral"
+        />
+        <StatCard
+          icon={<Receipt size={18} />}
+          label="Purchases tracked"
+          value={String(state.transactions.length)}
           tone="neutral"
         />
       </div>
@@ -191,11 +145,17 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
               View all <ArrowRight size={14} />
             </button>
           </div>
-          <div className="divide-y divide-ink-100 px-5 pb-2">
-            {recent.map((tx) => (
-              <TransactionRow key={tx.id} tx={tx} />
-            ))}
-          </div>
+          {recent.length === 0 ? (
+            <div className="px-5 pb-8 pt-4 text-center text-sm text-ink-400">
+              No purchases yet. Add one to start rounding up.
+            </div>
+          ) : (
+            <div className="divide-y divide-ink-100 px-5 pb-2">
+              {recent.map((tx) => (
+                <TransactionRow key={tx.id} tx={tx} />
+              ))}
+            </div>
+          )}
         </Card>
 
         <Card>

@@ -161,8 +161,8 @@ export function Settings() {
       </Card>
 
       <p className="pb-4 text-center text-xs text-ink-400">
-        Acol is a product demo. Balances, prices, and returns are simulated for
-        illustration only and are not investment advice.
+        Acol is a product demo. Growth projections use assumed long-term average
+        returns and are for illustration only — not investment advice.
       </p>
     </div>
   );

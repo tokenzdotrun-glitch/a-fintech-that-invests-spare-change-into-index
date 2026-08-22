@@ -1,20 +1,12 @@
 import { useMemo } from 'react';
-import { TrendingDown, TrendingUp, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { FUNDS, RISK_ORDER, RISK_PROFILES } from '../lib/portfolios';
-import { priceAt } from '../lib/engine';
+import { contributionsByFund } from '../lib/engine';
 import { useStore } from '../lib/store';
-import {
-  formatCurrency,
-  formatNumber,
-  formatPercent,
-  formatSignedPercent,
-} from '../lib/format';
+import { formatCurrency, formatPercent } from '../lib/format';
 import { Card, cn } from '../components/ui';
 import { AllocationDonut } from '../components/AllocationDonut';
-import { Sparkline } from '../components/Sparkline';
 import type { RiskProfileId } from '../lib/types';
-
-const MS_DAY = 86_400_000;
 
 export function Portfolio() {
   const { state, updateSettings } = useStore();
@@ -22,26 +14,8 @@ export function Portfolio() {
   const profile = RISK_PROFILES[state.settings.riskProfile];
 
   const fundRows = useMemo(() => {
-    return FUNDS.map((fund) => {
-      let shares = 0;
-      let basis = 0;
-      for (const ev of state.investments) {
-        const s = ev.byFund[fund.id] ?? 0;
-        if (s > 0) {
-          shares += s;
-          basis += s * priceAt(fund.id, ev.date);
-        }
-      }
-      const price = priceAt(fund.id, now);
-      const prev = priceAt(fund.id, now - MS_DAY);
-      const value = shares * price;
-      const gain = value - basis;
-      const gainPct = basis > 0 ? gain / basis : 0;
-      const dayChange = prev > 0 ? (price - prev) / prev : 0;
-      const series: number[] = [];
-      for (let i = 29; i >= 0; i--) series.push(priceAt(fund.id, now - i * MS_DAY));
-      return { fund, shares, value, basis, gain, gainPct, price, dayChange, series };
-    });
+    const held = contributionsByFund(state.investments, now);
+    return FUNDS.map((fund) => ({ fund, value: held[fund.id] ?? 0 }));
   }, [state.investments, now]);
 
   const held = fundRows.filter((r) => r.value > 0);
@@ -49,7 +23,6 @@ export function Portfolio() {
   const holdings = held
     .map((r) => ({
       fund: r.fund,
-      shares: r.shares,
       value: r.value,
       weight: totalValue > 0 ? r.value / totalValue : 0,
     }))
@@ -85,7 +58,7 @@ export function Portfolio() {
                 {profile.name} target mix
               </span>
               <span className="text-sm font-semibold text-brand-400">
-                ~{formatPercent(profile.expectedReturn)} / yr historical
+                ~{formatPercent(profile.expectedReturn)} / yr assumed
               </span>
             </div>
             <AllocationBar profileId={profile.id} />
@@ -103,19 +76,16 @@ export function Portfolio() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px]">
+            <table className="w-full min-w-[420px]">
               <thead>
                 <tr className="border-b border-ink-100 text-left text-xs font-semibold uppercase tracking-wide text-ink-400">
                   <th className="px-5 py-2.5">Fund</th>
-                  <th className="px-3 py-2.5 text-right">Price</th>
-                  <th className="px-3 py-2.5 text-right">30-day</th>
-                  <th className="px-3 py-2.5 text-right">Shares</th>
-                  <th className="px-3 py-2.5 text-right">Value</th>
-                  <th className="px-5 py-2.5 text-right">Return</th>
+                  <th className="px-3 py-2.5 text-right">Allocation</th>
+                  <th className="px-5 py-2.5 text-right">Value</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-ink-100">
-                {held.map((row) => (
+                {holdings.map((row) => (
                   <tr key={row.fund.id} className="text-sm">
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-3">
@@ -131,47 +101,11 @@ export function Portfolio() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-right">
-                      <p className="font-semibold tabular text-ink-800">
-                        {formatCurrency(row.price)}
-                      </p>
-                      <p
-                        className={cn(
-                          'text-xs font-semibold tabular',
-                          row.dayChange >= 0 ? 'text-brand-400' : 'text-rose-400'
-                        )}
-                      >
-                        {formatSignedPercent(row.dayChange)}
-                      </p>
-                    </td>
-                    <td className="px-3 py-3">
-                      <div className="flex justify-end">
-                        <Sparkline values={row.series} color={row.fund.color} />
-                      </div>
-                    </td>
                     <td className="px-3 py-3 text-right tabular text-ink-600">
-                      {formatNumber(row.shares, 4)}
+                      {formatPercent(row.weight)}
                     </td>
-                    <td className="px-3 py-3 text-right font-semibold tabular text-ink-900">
+                    <td className="px-5 py-3 text-right font-semibold tabular text-ink-900">
                       {formatCurrency(row.value)}
-                    </td>
-                    <td className="px-5 py-3 text-right">
-                      <span
-                        className={cn(
-                          'inline-flex items-center gap-1 font-semibold tabular',
-                          row.gain >= 0 ? 'text-brand-400' : 'text-rose-400'
-                        )}
-                      >
-                        {row.gain >= 0 ? (
-                          <TrendingUp size={13} />
-                        ) : (
-                          <TrendingDown size={13} />
-                        )}
-                        {formatSignedPercent(row.gainPct)}
-                      </span>
-                      <p className="text-xs text-ink-400 tabular">
-                        {formatCurrency(row.gain, { sign: true })}
-                      </p>
                     </td>
                   </tr>
                 ))}

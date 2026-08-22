@@ -50,7 +50,7 @@ function Shell() {
   const [view, setView] = useState<View>('dashboard');
   const [modalOpen, setModalOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const firstName = state.name.split(' ')[0];
+  const firstName = state.name.trim().split(' ')[0];
 
   return (
     <div className="min-h-screen">
@@ -136,7 +136,7 @@ function Shell() {
             </div>
             <div className="hidden lg:block">
               <p className="text-xs font-medium text-ink-400">
-                {greeting()}, {firstName}
+                {greeting()}{firstName ? `, ${firstName}` : ''}
               </p>
               <h1 className="text-xl font-extrabold tracking-tight text-ink-900">
                 {TITLES[view].title}

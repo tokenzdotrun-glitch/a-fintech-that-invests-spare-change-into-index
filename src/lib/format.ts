@@ -28,15 +28,3 @@ export function formatCompactCurrency(value: number): string {
 export function formatPercent(value: number, digits = 1): string {
   return `${(value * 100).toFixed(digits)}%`;
 }
-
-export function formatSignedPercent(value: number, digits = 2): string {
-  const prefix = value > 0 ? '+' : value < 0 ? '−' : '';
-  return `${prefix}${(Math.abs(value) * 100).toFixed(digits)}%`;
-}
-
-export function formatNumber(value: number, digits = 2): string {
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
-  }).format(value);
-}

@@ -5,12 +5,6 @@ export interface Fund {
   ticker: string;
   name: string;
   category: string;
-  /** Reference price at the simulation epoch. */
-  basePrice: number;
-  /** Expected annualized drift (log return). */
-  drift: number;
-  /** Annualized volatility used by the price simulator. */
-  vol: number;
   color: string;
   expenseRatio: number;
 }
@@ -47,7 +41,7 @@ export interface InvestmentEvent {
   amount: number;
   /** Where it came from. */
   source: 'roundup' | 'recurring' | 'boost';
-  /** fundId -> shares purchased. */
+  /** fundId -> dollars contributed (cost basis). */
   byFund: Record<string, number>;
 }
 
