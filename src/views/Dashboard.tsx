@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react';
-import { Coins, Wallet, PiggyBank, Receipt, ArrowRight } from 'lucide-react';
+import { Coins, Wallet, PiggyBank, Receipt, ArrowRight, Compass } from 'lucide-react';
 import {
   buildValueSeries,
+  contributionsByFund,
   holdingsBreakdown,
   portfolioValueAt,
   totalInvested,
 } from '../lib/engine';
+import { CATALOG } from '../lib/catalog';
 import { useStore } from '../lib/store';
 import { formatCurrency } from '../lib/format';
 import { Card, cn } from '../components/ui';
@@ -13,6 +15,9 @@ import { PerformanceChart } from '../components/PerformanceChart';
 import { RoundUpWallet } from '../components/RoundUpWallet';
 import { TransactionRow } from '../components/TransactionRow';
 import { AllocationDonut } from '../components/AllocationDonut';
+import { FundCard } from '../components/FundCard';
+import { FundDetailModal } from '../components/FundDetailModal';
+import type { CatalogAsset } from '../lib/types';
 import type { View } from '../App';
 
 const TIMEFRAMES = [
@@ -25,6 +30,7 @@ const TIMEFRAMES = [
 export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
   const { state } = useStore();
   const [tf, setTf] = useState<(typeof TIMEFRAMES)[number]['key']>('3M');
+  const [selectedFund, setSelectedFund] = useState<CatalogAsset | null>(null);
 
   const now = Date.now();
   const value = useMemo(
@@ -58,6 +64,15 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
     () => holdingsBreakdown(state.investments, now).filter((h) => h.value > 0),
     [state.investments, now]
   );
+
+  const trending = useMemo(
+    () => [...CATALOG].sort((a, b) => b.momentum - a.momentum).slice(0, 4),
+    []
+  );
+  const heldSet = useMemo(() => {
+    const held = contributionsByFund(state.investments, now);
+    return new Set(Object.keys(held).filter((id) => (held[id] ?? 0) > 0));
+  }, [state.investments, now]);
 
   const recent = state.transactions.slice(0, 6);
 
@@ -133,6 +148,35 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
         />
       </div>
 
+      {/* Discover */}
+      <div>
+        <div className="mb-3 flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <Compass size={17} className="text-brand-400" />
+            <h3 className="font-bold text-ink-900">Discover funds</h3>
+            <span className="hidden text-sm text-ink-400 sm:inline">
+              · trending across the app
+            </span>
+          </div>
+          <button
+            onClick={() => onNavigate('explore')}
+            className="inline-flex items-center gap-1 text-sm font-semibold text-brand-400 hover:text-brand-300"
+          >
+            Explore all <ArrowRight size={14} />
+          </button>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {trending.map((asset) => (
+            <FundCard
+              key={asset.id}
+              asset={asset}
+              held={heldSet.has(asset.id)}
+              onOpen={() => setSelectedFund(asset)}
+            />
+          ))}
+        </div>
+      </div>
+
       {/* Lower grid */}
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
@@ -173,6 +217,8 @@ export function Dashboard({ onNavigate }: { onNavigate: (v: View) => void }) {
           </div>
         </Card>
       </div>
+
+      <FundDetailModal asset={selectedFund} onClose={() => setSelectedFund(null)} />
     </div>
   );
 }

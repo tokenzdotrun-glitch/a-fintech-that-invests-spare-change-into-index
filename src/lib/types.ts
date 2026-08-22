@@ -1,5 +1,7 @@
 export type RiskProfileId = 'conservative' | 'moderate' | 'aggressive';
 
+export type RiskLevel = 'low' | 'medium' | 'high';
+
 export interface Fund {
   id: string;
   ticker: string;
@@ -7,6 +9,25 @@ export interface Fund {
   category: string;
   color: string;
   expenseRatio: number;
+}
+
+/** A discoverable investable asset in the Explore catalog. */
+export interface CatalogAsset extends Fund {
+  /** Short marketing description shown in discovery surfaces. */
+  description: string;
+  /** Assumed long-term annual return, for discovery copy & projections. */
+  expectedReturn: number;
+  riskLevel: RiskLevel;
+  /** Discovery tags. */
+  tags: string[];
+  /** 0..100 popularity score among users. */
+  popularity: number;
+  /** Trailing ~1 month price change (fraction, may be negative). */
+  momentum: number;
+  /** Latest indicative price per share. */
+  price: number;
+  /** True for the four core building-block funds used by risk profiles. */
+  core?: boolean;
 }
 
 export interface RiskProfile {
@@ -66,6 +87,8 @@ export interface AppState {
   investments: InvestmentEvent[];
   /** Cash sitting in the round-up wallet not yet invested (in cents to avoid fp drift). */
   walletCents: number;
+  /** Fund ids the user has starred to watch. */
+  watchlist: string[];
   /** Last date we simulated recurring contributions through (ISO). */
   lastRecurringDate: string;
 }

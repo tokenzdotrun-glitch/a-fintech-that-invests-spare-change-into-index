@@ -13,13 +13,15 @@ import {
   splitByAllocation,
   uid,
 } from './engine';
-import type { AppState, Settings, Transaction } from './types';
+import type { AppState, InvestmentEvent, Settings, Transaction } from './types';
 
 const STORAGE_KEY = 'acol.state.v2';
 
 type Action =
   | { type: 'ADD_TX'; tx: Transaction }
   | { type: 'INVEST_NOW' }
+  | { type: 'INVEST_IN_FUND'; fundId: string }
+  | { type: 'TOGGLE_WATCH'; fundId: string }
   | { type: 'UPDATE_SETTINGS'; patch: Partial<Settings> }
   | { type: 'RESET' }
   | { type: 'LOAD'; state: AppState };
@@ -28,16 +30,20 @@ function toTime(d: string): number {
   return new Date(d).getTime();
 }
 
-function sweepWallet(state: AppState, source: 'roundup' = 'roundup'): AppState {
+function sweepWallet(
+  state: AppState,
+  source: InvestmentEvent['source'] = 'roundup',
+  byFundOverride?: Record<string, number>
+): AppState {
   if (state.walletCents <= 0) return state;
   const amount = state.walletCents / 100;
   const now = new Date().toISOString();
-  const investment = {
+  const investment: InvestmentEvent = {
     id: uid('inv'),
     date: now,
     amount,
     source,
-    byFund: splitByAllocation(amount, state.settings.riskProfile),
+    byFund: byFundOverride ?? splitByAllocation(amount, state.settings.riskProfile),
   };
   return {
     ...state,
@@ -73,6 +79,22 @@ function reducer(state: AppState, action: Action): AppState {
 
     case 'INVEST_NOW':
       return sweepWallet(state);
+
+    case 'INVEST_IN_FUND': {
+      const amount = state.walletCents / 100;
+      if (amount <= 0) return state;
+      return sweepWallet(state, 'boost', { [action.fundId]: amount });
+    }
+
+    case 'TOGGLE_WATCH': {
+      const watching = state.watchlist.includes(action.fundId);
+      return {
+        ...state,
+        watchlist: watching
+          ? state.watchlist.filter((id) => id !== action.fundId)
+          : [action.fundId, ...state.watchlist],
+      };
+    }
 
     case 'UPDATE_SETTINGS': {
       const settings = { ...state.settings, ...action.patch };
@@ -123,10 +145,11 @@ function loadState(): AppState {
   return generateInitialState();
 }
 
-// keep forward-compatible defaults for any newly-added settings keys
+// keep forward-compatible defaults for any newly-added state keys
 function withDefaults(parsed: AppState): AppState {
   return {
     ...parsed,
+    watchlist: parsed.watchlist ?? [],
     settings: { ...DEFAULT_SETTINGS, ...parsed.settings },
   };
 }
@@ -139,6 +162,9 @@ interface StoreValue {
     category: string;
   }) => void;
   investNow: () => void;
+  investInFund: (fundId: string) => void;
+  toggleWatch: (fundId: string) => void;
+  isWatched: (fundId: string) => boolean;
   updateSettings: (patch: Partial<Settings>) => void;
   reset: () => void;
   pendingTransactions: Transaction[];
@@ -184,6 +210,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         });
       },
       investNow: () => dispatch({ type: 'INVEST_NOW' }),
+      investInFund: (fundId) => dispatch({ type: 'INVEST_IN_FUND', fundId }),
+      toggleWatch: (fundId) => dispatch({ type: 'TOGGLE_WATCH', fundId }),
+      isWatched: (fundId) => state.watchlist.includes(fundId),
       updateSettings: (patch) => dispatch({ type: 'UPDATE_SETTINGS', patch }),
       reset: () => dispatch({ type: 'RESET' }),
       pendingTransactions,

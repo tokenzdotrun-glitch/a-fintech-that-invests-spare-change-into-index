@@ -1,4 +1,5 @@
 import { FUNDS, RISK_PROFILES } from './portfolios';
+import { ASSET_MAP } from './catalog';
 import type {
   AppState,
   Fund,
@@ -102,10 +103,16 @@ export function holdingsBreakdown(
   date: string | number | Date = Date.now()
 ): FundHolding[] {
   const held = contributionsByFund(investments, date);
+  // Always surface the core building blocks, plus any directly-invested funds.
+  const ids = new Set<string>(FUNDS.map((f) => f.id));
+  for (const id of Object.keys(held)) ids.add(id);
+
   const rows: FundHolding[] = [];
   let total = 0;
-  for (const fund of FUNDS) {
-    const value = held[fund.id] ?? 0;
+  for (const id of ids) {
+    const fund = ASSET_MAP[id];
+    if (!fund) continue;
+    const value = held[id] ?? 0;
     total += value;
     rows.push({ fund, value, weight: 0 });
   }
@@ -171,6 +178,7 @@ export function generateInitialState(name = ''): AppState {
     transactions: [],
     investments: [],
     walletCents: 0,
+    watchlist: [],
     lastRecurringDate: now.toISOString(),
   };
 }

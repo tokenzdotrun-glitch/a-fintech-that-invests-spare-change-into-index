@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard,
+  Compass,
   Receipt,
   PieChart,
   Sprout,
@@ -14,16 +15,24 @@ import { Logo } from './components/Logo';
 import { Button, cn } from './components/ui';
 import { SimulatePurchaseModal } from './components/SimulatePurchaseModal';
 import { Dashboard } from './views/Dashboard';
+import { Explore } from './views/Explore';
 import { Transactions } from './views/Transactions';
 import { Portfolio } from './views/Portfolio';
 import { Grow } from './views/Grow';
 import { Settings } from './views/Settings';
 import { formatCurrency } from './lib/format';
 
-export type View = 'dashboard' | 'transactions' | 'portfolio' | 'grow' | 'settings';
+export type View =
+  | 'dashboard'
+  | 'explore'
+  | 'transactions'
+  | 'portfolio'
+  | 'grow'
+  | 'settings';
 
 const NAV: { id: View; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'explore', label: 'Explore', icon: Compass },
   { id: 'transactions', label: 'Transactions', icon: Receipt },
   { id: 'portfolio', label: 'Portfolio', icon: PieChart },
   { id: 'grow', label: 'Grow', icon: Sprout },
@@ -32,6 +41,7 @@ const NAV: { id: View; label: string; icon: typeof LayoutDashboard }[] = [
 
 const TITLES: Record<View, { title: string; subtitle: string }> = {
   dashboard: { title: 'Dashboard', subtitle: "Here's how your spare change is doing." },
+  explore: { title: 'Explore', subtitle: 'Discover new funds to invest in.' },
   transactions: { title: 'Transactions', subtitle: 'Every purchase, rounded up.' },
   portfolio: { title: 'Portfolio', subtitle: 'Your diversified index-fund mix.' },
   grow: { title: 'Grow', subtitle: 'See where your round-ups could take you.' },
@@ -174,6 +184,7 @@ function Shell() {
               transition={{ duration: 0.22, ease: 'easeOut' }}
             >
               {view === 'dashboard' && <Dashboard onNavigate={setView} />}
+              {view === 'explore' && <Explore />}
               {view === 'transactions' && (
                 <Transactions onSimulate={() => setModalOpen(true)} />
               )}
@@ -187,7 +198,7 @@ function Shell() {
 
       {/* Mobile bottom nav */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-ink-100 bg-surface/95 backdrop-blur-md lg:hidden">
-        <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-1.5">
+        <div className="mx-auto flex max-w-lg items-center justify-around px-1 py-1.5">
           {NAV.map((item) => {
             const Icon = item.icon;
             const active = view === item.id;
@@ -196,12 +207,12 @@ function Shell() {
                 key={item.id}
                 onClick={() => setView(item.id)}
                 className={cn(
-                  'flex flex-1 flex-col items-center gap-0.5 rounded-lg px-1 py-2 text-[10px] font-semibold transition',
+                  'flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-lg px-0.5 py-2 text-[10px] font-semibold transition',
                   active ? 'text-brand-400' : 'text-ink-400'
                 )}
               >
-                <Icon size={20} />
-                {item.label}
+                <Icon size={20} className="shrink-0" />
+                <span className="w-full truncate text-center">{item.label}</span>
               </button>
             );
           })}

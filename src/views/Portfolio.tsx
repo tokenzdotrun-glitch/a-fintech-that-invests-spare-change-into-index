@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Check } from 'lucide-react';
 import { FUNDS, RISK_ORDER, RISK_PROFILES } from '../lib/portfolios';
-import { contributionsByFund } from '../lib/engine';
+import { holdingsBreakdown } from '../lib/engine';
 import { useStore } from '../lib/store';
 import { formatCurrency, formatPercent } from '../lib/format';
 import { Card, cn } from '../components/ui';
@@ -13,20 +13,13 @@ export function Portfolio() {
   const now = Date.now();
   const profile = RISK_PROFILES[state.settings.riskProfile];
 
-  const fundRows = useMemo(() => {
-    const held = contributionsByFund(state.investments, now);
-    return FUNDS.map((fund) => ({ fund, value: held[fund.id] ?? 0 }));
-  }, [state.investments, now]);
+  const holdings = useMemo(
+    () => holdingsBreakdown(state.investments, now).filter((h) => h.value > 0),
+    [state.investments, now]
+  );
 
-  const held = fundRows.filter((r) => r.value > 0);
-  const totalValue = held.reduce((s, r) => s + r.value, 0);
-  const holdings = held
-    .map((r) => ({
-      fund: r.fund,
-      value: r.value,
-      weight: totalValue > 0 ? r.value / totalValue : 0,
-    }))
-    .sort((a, b) => b.value - a.value);
+  const held = holdings;
+  const totalValue = holdings.reduce((s, r) => s + r.value, 0);
 
   return (
     <div className="space-y-6">

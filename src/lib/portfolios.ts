@@ -1,43 +1,11 @@
 import type { Fund, RiskProfile, RiskProfileId } from './types';
+import { ASSET_MAP, CATALOG } from './catalog';
 
-export const FUNDS: Fund[] = [
-  {
-    id: 'VTI',
-    ticker: 'VTI',
-    name: 'US Total Market',
-    category: 'US Equity',
-    color: '#10b981',
-    expenseRatio: 0.03,
-  },
-  {
-    id: 'VXUS',
-    ticker: 'VXUS',
-    name: 'International Equity',
-    category: 'Intl Equity',
-    color: '#3b82f6',
-    expenseRatio: 0.07,
-  },
-  {
-    id: 'BND',
-    ticker: 'BND',
-    name: 'US Total Bond',
-    category: 'Bonds',
-    color: '#f59e0b',
-    expenseRatio: 0.03,
-  },
-  {
-    id: 'VNQ',
-    ticker: 'VNQ',
-    name: 'Real Estate',
-    category: 'Real Estate',
-    color: '#a855f7',
-    expenseRatio: 0.13,
-  },
-];
+/** The four low-cost building blocks used by risk-profile allocations. */
+export const FUNDS: Fund[] = CATALOG.filter((a) => a.core);
 
-export const FUND_MAP: Record<string, Fund> = Object.fromEntries(
-  FUNDS.map((f) => [f.id, f])
-);
+/** Lookup across the entire investable universe (core + discoverable). */
+export const FUND_MAP: Record<string, Fund> = ASSET_MAP;
 
 export const RISK_PROFILES: Record<RiskProfileId, RiskProfile> = {
   conservative: {
