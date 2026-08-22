@@ -139,8 +139,8 @@ export function Settings() {
       <Card className="border-rose-500/30">
         <SettingHeader
           icon={<RotateCcw size={18} />}
-          title="Reset demo"
-          desc="Wipe this account and generate a fresh set of sample data."
+          title="Reset account"
+          desc="Wipe this account and start over with a clean, empty balance."
         />
         <div className="p-5 pt-0">
           <Button
@@ -148,7 +148,7 @@ export function Settings() {
             onClick={() => {
               if (
                 confirm(
-                  'Reset all data and generate a new sample account? This cannot be undone.'
+                  'Reset all data back to an empty account? This cannot be undone.'
                 )
               ) {
                 reset();

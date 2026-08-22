@@ -293,84 +293,22 @@ export const DEFAULT_SETTINGS: Settings = {
 };
 
 /**
- * Builds a believable starter account: ~110 days of purchases with round-ups
- * that have been swept into the portfolio over time, plus weekly recurring
- * contributions, leaving a few recent purchases pending in the wallet.
+ * Builds a fresh, empty account: no transactions, no investments, and an empty
+ * round-up wallet. All balances start at zero and populate as the user adds
+ * purchases.
  */
 export function generateInitialState(name = 'Alex Rivera'): AppState {
   const settings = { ...DEFAULT_SETTINGS };
-  const rng = mulberry32(20240517);
   const now = new Date();
-  const daysBack = 112;
-
-  const transactions: Transaction[] = [];
-  const investments: InvestmentEvent[] = [];
-
-  let walletCents = 0;
-  let pending: Transaction[] = [];
-  let lastRecurring = new Date(now.getTime() - daysBack * MS_DAY);
-
-  for (let d = daysBack; d >= 0; d--) {
-    const dayDate = new Date(now.getTime() - d * MS_DAY);
-    // 0–3 purchases per day
-    const roll = rng();
-    const count = roll < 0.22 ? 0 : roll < 0.6 ? 1 : roll < 0.87 ? 2 : 3;
-
-    for (let i = 0; i < count; i++) {
-      const ts = new Date(dayDate);
-      ts.setHours(7 + Math.floor(rng() * 15), Math.floor(rng() * 60), 0, 0);
-      if (ts.getTime() > now.getTime()) continue;
-      const tx = makeTransaction(rng, ts, settings);
-      transactions.push(tx);
-      pending.push(tx);
-      walletCents += Math.round(tx.roundUp * 100);
-    }
-
-    // weekly recurring boost
-    if (dayDate.getTime() - lastRecurring.getTime() >= 7 * MS_DAY && settings.weeklyRecurring > 0) {
-      lastRecurring = dayDate;
-      // only sweep recurring for days at least a couple days in the past
-      if (d > 1) {
-        investments.push({
-          id: uid('inv'),
-          date: dayDate.toISOString(),
-          amount: settings.weeklyRecurring,
-          source: 'recurring',
-          byFund: buySharesForAmount(settings.weeklyRecurring, settings.riskProfile, dayDate),
-        });
-      }
-    }
-
-    // auto-invest sweep once threshold reached, but keep the last ~2 days pending
-    if (
-      settings.autoInvest &&
-      walletCents >= settings.sweepThreshold * 100 &&
-      d > 2
-    ) {
-      const amount = walletCents / 100;
-      investments.push({
-        id: uid('inv'),
-        date: dayDate.toISOString(),
-        amount,
-        source: 'roundup',
-        byFund: buySharesForAmount(amount, settings.riskProfile, dayDate),
-      });
-      for (const p of pending) p.status = 'invested';
-      pending = [];
-      walletCents = 0;
-    }
-  }
-
-  transactions.sort((a, b) => toTime(b.date) - toTime(a.date));
 
   return {
-    createdAt: new Date(now.getTime() - daysBack * MS_DAY).toISOString(),
+    createdAt: now.toISOString(),
     name,
     settings,
-    transactions,
-    investments,
-    walletCents,
-    lastRecurringDate: lastRecurring.toISOString(),
+    transactions: [],
+    investments: [],
+    walletCents: 0,
+    lastRecurringDate: now.toISOString(),
   };
 }
 
